@@ -26,18 +26,37 @@ app.use(express.urlencoded({ extended: true }));
 app.get('/login', (req, res) => {
     // send them the form!!
     // res.send('LOGIN FORM, DUHH');
-    res.render('login-form');
+    res.render('login-form', {
+        locals: {
+            email: '',
+            message: ''
+        }
+    });
 });
 
 // When they submit the form, process the form data. 
-app.post('/login', (req, res) => {
+app.post('/login', async (req, res) => {
     console.log(req.body.email);
     console.log(req.body.password);
     // res.send('Send me something');
     // lets assume they typed in the correct password
+    const theUser = await User.getByEmail(req.body.email);
+    const passwordIsCorrect = theUser.checkPassword(req.body.password);
+    if (passwordIsCorrect) {
+        res.redirect('/dashboard');
+    } else {
+        console.log('NOT WORKING')
+        // send the form back, but with the email already filled out. 
+        res.render('login-form', {
+            locals: {
+                email: req.body.email,
+                message: 'Password incorrect. Please ty again.'
+            }
+        });
+    }
     
-    res.redirect('/dashboard');
 });
+
 
 app.get('/dashboard', (req, res) => [
     res.send('Yassss, you made it in to the club')
