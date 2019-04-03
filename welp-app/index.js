@@ -4,6 +4,19 @@ const es6Renderer = require('express-es6-template-engine');
 const http = require('http');
 const querystring = require('querystring');
 
+// Require my session and sessions storage modules
+// This modele lets express track users as they go from page to page. 
+const session = require('express-session');
+
+// Import the session stroage module and wire it up to the session module. 
+const FileStore = require('session-file-store')(session);
+
+// Tell express to use the session modules
+app.use(session({
+    store: new FileStore(), 
+    secret: 'yahayahayha'
+}))
+
 // const hostname = '127.0.0.1';
 const PORT = 3000;
 
@@ -33,17 +46,35 @@ app.get('/login', (req, res) => {
         }
     });
 });
+// ================================================================
+// ========== USED TO FORCE THE CODE TO WORK ======================
+async function demo() {
+    const user = await User.getByEmail('puppypower@yahoo.com');
+    user.setPassword("spots");
+    const pass = await user.save();
+    console.log('you did the thing')
+}
+demo();
+// ================================================================
 
 // When they submit the form, process the form data. 
 app.post('/login', async (req, res) => {
-    console.log(req.body.email);
-    console.log(req.body.password);
+    console.log(`EMAIL ME == ${req.body.email}`);
+    console.log(`USE MY SECRET PW == ${req.body.password}`);
     // res.send('Send me something');
     // lets assume they typed in the correct password
     const theUser = await User.getByEmail(req.body.email);
+    // console.log(theUser)
     const passwordIsCorrect = theUser.checkPassword(req.body.password);
+    console.log(`STOLEN == ${passwordIsCorrect}`)
     if (passwordIsCorrect) {
-        res.redirect('/dashboard');
+        
+        // Save the user's id to the session.
+        req.session.user = theUser.id;
+        // Make sure the sessions is saved before we redirect.
+        req.session.save(() => {
+            res.redirect('/dashboard');
+        });
     } else {
         console.log('NOT WORKING')
         // send the form back, but with the email already filled out. 
@@ -58,9 +89,10 @@ app.post('/login', async (req, res) => {
 });
 
 
-app.get('/dashboard', (req, res) => [
-    res.send('Yassss, you made it in to the club')
-]);
+app.get('/dashboard', (req, res) => {
+    console.log(`YOU ARE == ${req.session.user}`);
+    res.send('YASSSS, YOU ARE NOW A MEMBER OF SECRET SOCIETY!!')
+});
 
 app.get('/restaurant', async (req, res) => {
     const allRestaurants = await Restaurant.getAll();

@@ -3,7 +3,7 @@ insert into users
 values
     ('Lady', 'Godiva', 'chocobessed@hotmail.com', 'nakedtruth!'),
     ('Nicolas', 'Flamel', 'tomorrowneverdies@netscape.net', 'g3t570n3d'),
-    ('Cruella', 'DeVille', 'puppypower@yahoo.com', 'SpotsSpotsSpots'),
+    ('Cruella', 'DeVille', 'puppypower@yahoo.com', 'spots'),
     ('Lennie', 'Small', 'bunnybuddy@outlook.com', 'nonAlgern0n')
 ;
 

@@ -108,6 +108,7 @@ class User {
         const salt = bcrypt.genSaltSync(10);
         const hash = bcrypt.hashSync(newPassword, salt);
         this.password = hash;
+        console.log(this.password)
     }
 
     static getByEmail(email) {
